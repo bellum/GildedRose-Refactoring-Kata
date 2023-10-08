@@ -88,6 +88,14 @@ class TicketsStrategy(NormalSellInChangeStrategy):
         return -current_quality
 
 
+class ConjuredStrategy(NormalSellInChangeStrategy):
+    def get_daily_quality_change_before_end_date(self, days_till_end_date: int) -> int:
+        return -2
+
+    def get_daily_quality_change_after_end_date(self, current_quality: int) -> int:
+        return -2
+
+
 class GildedRose(object):
     def __init__(self, items):
         self.items = items
@@ -101,6 +109,8 @@ class GildedRose(object):
                 return CheeseStrategy(item)
             case "Backstage passes to a TAFKAL80ETC concert":
                 return TicketsStrategy(item)
+            case "Conjured Mana Cake":
+                return ConjuredStrategy(item)
             case _:
                 return CommonStrategy(item)
 
