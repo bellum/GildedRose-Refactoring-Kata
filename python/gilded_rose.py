@@ -1,14 +1,10 @@
 # -*- coding: utf-8 -*-
 import abc
-import enum
 
 
 class AbsStrategy(object, metaclass=abc.ABCMeta):
     MIN_QUALITY = 0
     MAX_QUALITY = 50
-
-    def __init__(self, item: 'Item'):
-        self.__item = item
 
     @abc.abstractmethod
     def get_daily_sell_in_change(self) -> int:
@@ -22,26 +18,26 @@ class AbsStrategy(object, metaclass=abc.ABCMeta):
     def get_daily_quality_change_after_end_date(self, current_quality: int) -> int:
         """"""
 
-    def update_item(self):
-        self.__update_quality()
-        self.__update_sell_in()
+    def update_item(self, item):
+        self.__update_quality(item)
+        self.__update_sell_in(item)
 
-    def __update_sell_in(self):
-        self.__item.sell_in += self.get_daily_sell_in_change()
+    def __update_sell_in(self, item):
+        item.sell_in += self.get_daily_sell_in_change()
 
-    def __update_quality(self):
-        if self.__item.sell_in <= 0:
-            change = self.get_daily_quality_change_after_end_date(self.__item.quality)
+    def __update_quality(self, item):
+        if item.sell_in <= 0:
+            change = self.get_daily_quality_change_after_end_date(item.quality)
         else:
-            change = self.get_daily_quality_change_before_end_date(self.__item.sell_in)
+            change = self.get_daily_quality_change_before_end_date(item.sell_in)
 
         if change == 0:
             return
 
         if change > 0:
-            self.__item.quality = min(self.__item.quality + change, self.MAX_QUALITY)
+            item.quality = min(item.quality + change, self.MAX_QUALITY)
         else:
-            self.__item.quality = max(self.__item.quality + change, self.MIN_QUALITY)
+            item.quality = max(item.quality + change, self.MIN_QUALITY)
 
 
 class NoChangeStrategy(AbsStrategy):
@@ -104,20 +100,20 @@ class GildedRose(object):
     def get_strategy(cls, item: 'Item') -> AbsStrategy:
         match item.name:
             case "Sulfuras, Hand of Ragnaros":
-                return NoChangeStrategy(item)
+                return NoChangeStrategy()
             case "Aged Brie":
-                return CheeseStrategy(item)
+                return CheeseStrategy()
             case "Backstage passes to a TAFKAL80ETC concert":
-                return TicketsStrategy(item)
+                return TicketsStrategy()
             case "Conjured Mana Cake":
-                return ConjuredStrategy(item)
+                return ConjuredStrategy()
             case _:
-                return CommonStrategy(item)
+                return CommonStrategy()
 
     def update_quality(self):
         for item in self.items:
             strategy = self.get_strategy(item)
-            strategy.update_item()
+            strategy.update_item(item)
 
 
 class Item:
