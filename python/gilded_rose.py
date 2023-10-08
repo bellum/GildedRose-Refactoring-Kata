@@ -89,7 +89,7 @@ class ConjuredStrategy(NormalSellInChangeStrategy):
         return -2
 
     def get_daily_quality_change_after_end_date(self, current_quality: int) -> int:
-        return -2
+        return -4
 
 
 class GildedRose(object):
